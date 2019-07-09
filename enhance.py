@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""                          _              _                           
-  _ __   ___ _   _ _ __ __ _| |   ___ _ __ | |__   __ _ _ __   ___ ___  
- | '_ \ / _ \ | | | '__/ _` | |  / _ \ '_ \| '_ \ / _` | '_ \ / __/ _ \ 
- | | | |  __/ |_| | | | (_| | | |  __/ | | | | | | (_| | | | | (_|  __/ 
- |_| |_|\___|\__,_|_|  \__,_|_|  \___|_| |_|_| |_|\__,_|_| |_|\___\___| 
+"""                          _              _
+  _ __   ___ _   _ _ __ __ _| |   ___ _ __ | |__   __ _ _ __   ___ ___
+ | '_ \ / _ \ | | | '__/ _` | |  / _ \ '_ \| '_ \ / _` | '_ \ / __/ _ \
+ | | | |  __/ |_| | | | (_| | | |  __/ | | | | | | (_| | | | | (_|  __/
+ |_| |_|\___|\__,_|_|  \__,_|_|  \___|_| |_|_| |_|\__,_|_| |_|\___\___|
 
 """
 #
@@ -353,7 +353,7 @@ class Model(object):
     def load_perceptual(self):
         """Open the serialized parameters from a pre-trained network, and load them into the model created.
         """
-        vgg19_file = os.path.join(os.path.dirname(__file__), 'vgg19_conv.pkl.bz2')
+        vgg19_file = os.path.join(os.path.dirname(__file__), 'vgg19_conv.pkl')
         if not os.path.exists(vgg19_file):
             error("Model file with pre-trained convolution layers not found. Download here...",
                   "https://github.com/alexjc/neural-doodle/releases/download/v0.0/vgg19_conv.pkl.bz2")
@@ -369,15 +369,15 @@ class Model(object):
             yield (name, l)
 
     def get_filename(self, absolute=False):
-        filename = 'ne%ix-%s-%s-%s.pkl.bz2' % (args.zoom, args.type, args.model, __version__)
-        return os.path.join(os.path.dirname(__file__), filename) if absolute else filename
+    	filename = 'ne%ix-%s-%s-%s.pkl' % (args.zoom, args.type, args.model, __version__)
+    	return os.path.join(os.path.dirname(__file__), filename) if absolute else filename
 
     def save_generator(self):
         def cast(p): return p.get_value().astype(np.float16)
         params = {k: [cast(p) for p in l.get_params()] for (k, l) in self.list_generator_layers()}
         config = {k: getattr(args, k) for k in ['generator_blocks', 'generator_residual', 'generator_filters'] + \
                                                ['generator_upscale', 'generator_downscale']}
-        
+
         pickle.dump((config, params), bz2.open(self.get_filename(absolute=True), 'wb'))
         print('  - Saved model as `{}` after training.'.format(self.get_filename()))
 
@@ -387,7 +387,7 @@ class Model(object):
             error("Model file with pre-trained convolution layers not found. Download it here...",
                   "https://github.com/alexjc/neural-enhance/releases/download/v%s/%s"%(__version__, self.get_filename()))
         print('  - Loaded file `{}` with trained model.'.format(self.get_filename()))
-        return pickle.load(bz2.open(self.get_filename(absolute=True), 'rb'))
+        return pickle.load(open(self.get_filename(absolute=True), 'rb'))
 
     def load_generator(self, params):
         if len(params) == 0: return
